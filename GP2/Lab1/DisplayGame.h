@@ -22,7 +22,6 @@ private:
 
 	void ReturnError(std::string errorMessage);
 
-
 	SDL_Window* window; //holds pointer to out window
 	int screenX;
 	int screenY;

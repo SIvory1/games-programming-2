@@ -6,10 +6,7 @@ MeshManager::MeshManager()
 {
 	drawCounter = NULL;
 	VAObject = NULL;
-	VABuffer[NUM_OF_BUFFERS] = {};
-
-	//meshSphere = col.
-	
+	VABuffer[NUM_OF_BUFFERS] = NULL;	
 }
 
 MeshManager::~MeshManager()
@@ -25,7 +22,6 @@ void MeshManager::Intitalize(Vertex* vertices, unsigned int verticesCount, unsig
 	{
 		model.positions.push_back(*vertices[i].GetPos());
 		model.texCoords.push_back(*vertices[i].GetTexCoord());
-		//model.normals.push_back(*vertices[i].GetNormal());
 	}
 
 	for (unsigned int i = 0; i < indicesCount; i++)
@@ -76,14 +72,13 @@ void MeshManager::Draw()
 	glBindVertexArray(VAObject);
 
 	glDrawElements(GL_TRIANGLES, drawCounter, GL_UNSIGNED_INT, 0);
-	//glDrawArrays(GL_TRIANGLES, 0, drawCount);
 
 	glBindVertexArray(0);
 }
-void MeshManager::updateSphereData(glm::vec3 pos, float radius)
+void MeshManager::UpdateColData(glm::vec3 pos, float rad)
 {
-	meshSphere.SetPos(pos);
-	meshSphere.SetRadius(radius);
+	colMesh.SetPos(pos);
+	colMesh.SetRad(rad);
 }
 
 

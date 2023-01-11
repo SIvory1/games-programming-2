@@ -50,13 +50,10 @@ void AudioManager::PlaySound(const int which) const
 {
     if (which > soundHolder.size() - 1)
     {
-        std::cout << "Sound out of range.\n";
         return;
     }
 
     Mix_PlayChannel(-1, soundHolder[which], 0);
-
-    std::cout << "Played Sound: " << which << '\n';
 }
 
 void AudioManager::PlayAudio()

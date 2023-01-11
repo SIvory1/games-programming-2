@@ -4,6 +4,7 @@
 
 ShaderManager::ShaderManager()
 {
+	program = NULL;	
 }
 
 ShaderManager::~ShaderManager()
@@ -25,12 +26,10 @@ void ShaderManager::InitalizeShader(const std::string& filename)
 	for (unsigned int i = 0; i < NUM_OF_SHADERS; i++)
 	{
 		glAttachShader(program, shaders[i]); //add all our shaders to the shader program "shaders" 
-		glDeleteShader(shaders[i]); //deletes shaders once attached
 	}
 
 	glBindAttribLocation(program, 0, "position"); // associate attribute variable with our shader program attribute (in this case attribute vec3 position;)
 	glBindAttribLocation(program, 1, "texCoord");
-	glBindAttribLocation(program, 2, "normals");
 
 	glLinkProgram(program); //create executables that will run on the GPU shaders
 	CheckShaderError(program, GL_LINK_STATUS, true, "Error: Shader program linking failed"); // cheack for error
@@ -44,7 +43,6 @@ void ShaderManager::InitalizeShader(const std::string& filename)
 	uniforms[PROJECTION_U] = glGetUniformLocation(program, "projection"); // associate with the location of uniform variable within a program 
 	uniforms[MODEL_U] = glGetUniformLocation(program, "model"); // associate with the location of uniform variable within a program 
 	uniforms[CAMERAPOS_U] = glGetUniformLocation(program, "cameraPos"); // associate with the location of uniform variable within a program
-	uniforms[SKYBOX_U] = glGetUniformLocation(program, "skybox");
 }
 
 void ShaderManager::Bind()
@@ -65,8 +63,6 @@ void ShaderManager::UpdateCubemap(const MainCamera& cam)
 
 	glUniformMatrix4fv(uniforms[VIEWMATRIX_U], 1, GLU_FALSE, &view[0][0]);
 	glUniformMatrix4fv(uniforms[PROJECTION_U], 1, GLU_FALSE, &projection[0][0]);
-
-	glUniform1i(uniforms[SKYBOX_U], 0);
 }
 
 void ShaderManager::UpdateReflections(const Transform& transform, const MainCamera& cam)
@@ -79,11 +75,7 @@ void ShaderManager::UpdateReflections(const Transform& transform, const MainCame
 	glUniformMatrix4fv(uniforms[VIEWMATRIX_U], 1, GLU_FALSE, &view[0][0]);
 	glUniformMatrix4fv(uniforms[PROJECTION_U], 1, GLU_FALSE, &projection[0][0]);
 	glUniformMatrix4fv(uniforms[MODEL_U], 1, GLU_FALSE, &model[0][0]);
-	//glUniformMatrix3fv(uniforms[CAMERAPOS_U], 1, GLU_FALSE, &cameraPos[0]);
 	glUniform3fv(uniforms[CAMERAPOS_U], 1, &cameraPos[0]);
-	
-
-	glUniform1i(uniforms[SKYBOX_U], 0);
 }
 
 GLuint ShaderManager::CreateShader(const std::string& text, unsigned int type)

@@ -5,7 +5,7 @@ DisplayGame::DisplayGame()
 {
 	// intitazaling variables from header
 	glContext = nullptr;
-	window = nullptr; //initialise to generate null access violation for debugging. 
+	window = nullptr; 
 	screenX = 1024;
 	screenY = 768;
 }

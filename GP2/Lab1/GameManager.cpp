@@ -22,8 +22,10 @@ GameManager::GameManager()
 	counter = 1.0f;
 	collsionCounter = 1.0f;
 
-	preDeltaX = 0;
-	preDeltaY = 0;
+	x = 0;
+	y = 0;
+	preX = 0;
+	preY = 0;
 }
 
 GameManager::~GameManager()
@@ -42,15 +44,16 @@ void GameManager::SystemsStart()
 	gameAudio.AddAudio("..\\res\\background.wav");
 	gameAudio.AddSound("..\\res\\shoot.wav");
 
-	mesh.ModelLoader("..\\res\\monkey3.obj");
-	mesh2.ModelLoader("..\\res\\cube.obj");
-//	mesh3.ModelLoader("..\\res\\Zuccarello.obj");
 
+
+	mesh2.ModelLoader("..\\res\\cube.obj");
+	mesh4.ModelLoader("..\\res\\WoodenLog_obj.obj");
+	mesh5.ModelLoader("..\\res\\Apple_obj.obj");
 
 	// saves loadign from file all over;//
 	mesh1 = mesh;
 	
-	mainCamera.InitializeCamera(glm::vec3(0, 0, -5), mainCamera.fov, (float)gameDisplay.getX()/gameDisplay.getY(), 0.01f, 1000.0f);
+	mainCamera.InitializeCamera(glm::vec3(0, 0, -5), glm::radians(mainCamera.fov), (float)gameDisplay.getX()/gameDisplay.getY(), 0.01f, 1000.0f);
 
 	shader.InitalizeShader("..\\res\\shader"); //new shader
 	// initalize cubemap shader here as well
@@ -63,8 +66,12 @@ void GameManager::SystemsStart()
 
 	cubeMap.CubeVertexArrayObject();
 
-	texture.TextureLoader("..\\res\\bricks.jpg"); //load texture
+	texture.TextureLoader("..\\res\\TarmacDark_D.jpg"); //load texture
 	texture1.TextureLoader("..\\res\\water.jpg"); //load texture
+	grenadeTexture.TextureLoader("..\\res\\WoodenLog_Diffuse_8K.jpg");
+	texture2.TextureLoader("..\\res\\apple l_Material.003_BaseColor.png");
+
+		gameAudio.PlayAudio();
 }
 
 //https://www.libsdl.org/release/SDL-1.2.15/docs/html/guidetimeexamples.html
@@ -88,10 +95,11 @@ void GameManager::GameActive()
 	next_time = SDL_GetTicks() + TICK_INTERVAL;
 	while (gameState != GameState::EXIT)
 	{
-	//	gameAudio.PlayAudio();	
 		ProcessInputs();
 		DrawGame();
-		newCol(mesh, mesh1);
+		IsColliding(mesh, mesh1);
+		IsColliding(mesh, mesh5);
+		IsColliding(mesh1, mesh5);
 		SDL_Delay(time_left());
 		next_time += TICK_INTERVAL;
 
@@ -120,19 +128,16 @@ void GameManager::ProcessInputs()
 				mainCamera.Zoom(-1);
 				cout << mainCamera.fov << '\n';
 				mainCamera.ChangeFOV(glm::radians(mainCamera.fov), (float)gameDisplay.getX() / gameDisplay.getY(), 0.01f, 1000.0f);
-				//	scale += 0.1f;
 			}
 		    if (event.wheel.y < 0)
 			{
 				mainCamera.Zoom(1);
 				cout << mainCamera.fov << '\n';
 				mainCamera.ChangeFOV(glm::radians(mainCamera.fov), (float)gameDisplay.getX() / gameDisplay.getY(), 0.01f, 1000.0f);
-				//	scale -= 0.1f;
 			}
 		}
 		case SDL_MOUSEBUTTONDOWN:
 		{
-			pressedDown = true;
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
 				offset += 1;
@@ -142,10 +147,6 @@ void GameManager::ProcessInputs()
 				offset -= 1;
 			}
 			break;
-		}
-		case SDL_MOUSEBUTTONUP:
-		{
-			pressedDown = false;
 		}
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym)
@@ -169,47 +170,50 @@ void GameManager::ProcessInputs()
 				mainCamera.MoveVertical(-1);
 				break;
 			case SDLK_e:
-				mainCamera.RotateX(-.1);
+				scale += .1;
 				break;
 			case SDLK_q:
+				if (scale > 0)
+				{
+					scale -= .1;
+				}
+				break;
+			case SDLK_v:
 				mainCamera.InitializeCamera(glm::vec3(0, 0, -5), mainCamera.fov, (float)gameDisplay.getX() / gameDisplay.getY(), 0.01f, 1000.0f);
-				break;	
-			default:
 				break;
 			}
 		case SDL_MOUSEMOTION:
 		{
 			// stores the x and y position of screen space
-			deltaX = event.motion.x;
-			deltaY = event.motion.y;
+			x = event.motion.x;
+			y = event.motion.y;
 			// checks to see if the x value has increased or decreases from last pos
-			if (deltaX > preDeltaX || deltaX >= (gameDisplay.getX()) -1)
+			if (x > preX || x >= (gameDisplay.getX()) - 1)
 			{
 				mainCamera.RotateX(-0.01);
 			}
-			else if (deltaX < preDeltaX || deltaX == 0)
+			else if (x < preX || x == 0)
 			{
 				mainCamera.RotateX(0.01);
 			}
 			// checks to see if the y value has increased or decreases from last pos
-		//	if (deltaY >= 200 && deltaY <= 550)	
-				if (deltaY > preDeltaY || deltaY >= (gameDisplay.getY()) - 1)
-				{
-					mainCamera.RotateY(0.01);
-				}
-				if (deltaY < preDeltaY || deltaY == 0)
-				{
-					mainCamera.RotateY(-0.01);
-				}		
+			if (y > preY || preY >= (gameDisplay.getY()) - 1)
+			{
+				mainCamera.RotateY(0.01);
+			}
+			if (y < preY || y == 0)
+			{
+				mainCamera.RotateY(-0.01);
+			}
 			// gives current pos to variables
-			preDeltaX = deltaX;
-			preDeltaY = deltaY;
+			preX = x;
+			preY = y;
 		}
 		}
     }
 }
 
-bool GameManager::newCol(MeshManager& mesh, MeshManager& mesh1)
+bool GameManager::IsColliding(MeshManager& mesh, MeshManager& mesh1)
 {
 	// magnitiude clacaultion
 	float distance = 
@@ -219,88 +223,75 @@ bool GameManager::newCol(MeshManager& mesh, MeshManager& mesh1)
 	if (distance * distance < (mesh.getSphereRadius() + mesh1.getSphereRadius()))
 	{	
     	collsionCounter *= 0;
-		//audioDevice.setlistner(myViewport.getPos(), m1Pos); // add bool to mesh
-	//	gameAudio.PlaySound(0);
+		gameAudio.PlaySound(0);
 		return true;
 	}
 		return false;
 }
 
 
-void GameManager::TransformMesh()
+void GameManager::Apple()
 {
-	//transform.SetPos(glm::vec3(sinf(counter), 0.5, 0.0));
-	//transform.SetRot(glm::vec3(0.0, 0.0, counter * 5));
-	//transform.SetScale(glm::vec3(0.6, 0.6, 0.6));
-
-	transform.SetPos(glm::vec3(offset, 0.0, 0.0));
+	transform.SetPos(glm::vec3(offset, -0.5, 0.0));
 	transform.SetRot(glm::vec3(0.0, counter * 2, 0.0));
 	transform.SetScale(glm::vec3(scale, scale, scale));
 
-	texture.BindTexture(0);
+	texture2.BindTexture(0);
 
 	shader.Bind();
 	shader.UpdateShader(transform, mainCamera);
 
-	mesh.updateSphereData(*transform.GetPos(), scale);
+	mesh5.UpdateColData(*transform.GetPos(), scale);
 
-	mesh.Draw();
+	mesh5.Draw();
 }
 
 
-void GameManager::TransformMesh1()
+void GameManager::Spinning()
 {
 	transform.SetPos(glm::vec3(-sinf(collsionCounter), -0.5, -sinf(collsionCounter) * 5));
 	transform.SetRot(glm::vec3(0.0, 0.0, 0/*counter * 5*/));
-	transform.SetScale(glm::vec3(0.6, 0.6, 0.6));
+	transform.SetScale(glm::vec3(scale, scale, scale));
 
-	texture1.BindTexture(0);
+	texture2.BindTexture(0);
 
 	shader.Bind();
 	shader.UpdateShader(transform, mainCamera);
 
-	mesh1.updateSphereData(*transform.GetPos(), 0.6f);
+	mesh1.UpdateColData(*transform.GetPos(), scale);
 	
-	mesh.Draw();
-
+	mesh5.Draw();
 }
 
-void GameManager::TransformMesh2()
+void GameManager::Ground()
 {
-	//transform.SetPos(glm::vec3(sinf(counter), 0.5, 0.0));
-	//transform.SetRot(glm::vec3(0.0, 0.0, counter * 5));
-	//transform.SetScale(glm::vec3(0.6, 0.6, 0.6));
-
-	transform.SetPos(glm::vec3(5, -4, -15));
-	transform.SetScale(glm::vec3(50, scale,50));
+	transform.SetPos(glm::vec3(10, -4, -15));
+	transform.SetScale(glm::vec3(50, 1 ,50));
 
 	texture.BindTexture(0);
 
 	shader.Bind();
 	shader.UpdateShader(transform, mainCamera);
 
-	mesh2.updateSphereData(*transform.GetPos(), 1); 
+	mesh2.UpdateColData(*transform.GetPos(), 1);
 
 	mesh2.Draw();
 }
 
-void GameManager::ShootObject()
+void GameManager::Tree()
 {
-	if (pressedDown)
-	{
-		transform.SetPos(glm::vec3(2 + offset, 0.0,0));
+		transform.SetPos(glm::vec3(5 + offset, 0.0,0));
 		transform.SetRot(glm::vec3(0.0, counter * 2, 0));
      	transform.SetScale(glm::vec3(scale, scale, scale));
 
-		texture1.BindTexture(0);
+		grenadeTexture.BindTexture(0);
 
 		shader.Bind();
 		shader.UpdateShader(transform, mainCamera);
 
-		mesh.updateSphereData(*transform.GetPos(), scale);
+		mesh.UpdateColData(*transform.GetPos(), scale);
 
-		mesh.Draw();
-	}
+		mesh4.Draw();
 }
 
 void GameManager::DrawSkyBox()
@@ -313,8 +304,7 @@ void GameManager::DrawSkyBox()
 	cubemapShader.UpdateCubemap(mainCamera);
 	cubeMap.DrawCubemap();
 }
-
-void GameManager::DrawReflection()
+void GameManager::DrawRefraction()
 {
 	transform.SetPos(glm::vec3(2, 0.0, 2));
 	transform.SetRot(glm::vec3(0.0, counter * 2, 0));
@@ -324,11 +314,10 @@ void GameManager::DrawReflection()
 	reflectionShader.UpdateReflections(transform, mainCamera);
 	cubeMap.DrawCube();
 }
-
-void GameManager::DrawRefraction()
+void GameManager::DrawReflection()
 {
 	transform.SetPos(glm::vec3(4, 0.0, 2));
-	transform.SetRot(glm::vec3(0.0, counter * 2, 0));
+	transform.SetRot(glm::vec3(0.0, counter , 0));
 	transform.SetScale(glm::vec3(1, 1, 1));
 
 	refractionShader.Bind();
@@ -340,21 +329,10 @@ void GameManager::DrawGame()
 {
 	gameDisplay.ClearDisplay(0.5, 0.5, 0.5, 1.0);
 
-/*transform.SetPos(glm::vec3(-4 + offset, 0.0, 0));
-	transform.SetRot(glm::vec3(0.0, counter * 2, 0));
-	transform.SetScale(glm::vec3(0.01, 0.01, 0.01));
-
-	texture1.BindTexture(0);
-
-	shader.Bind();
-	shader.UpdateShader(transform, mainCamera);
-
-	mesh3.Draw();*/
-
-	TransformMesh();
-    TransformMesh1();
-	TransformMesh2();
-	ShootObject();
+	Apple();
+    Spinning();
+	Ground();
+	Tree();
 	DrawRefraction();
 	DrawReflection();
 	DrawSkyBox();

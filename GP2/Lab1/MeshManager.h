@@ -29,25 +29,23 @@ struct Sphere
 {
 public:
 
-	Sphere() {}
-
 	glm::vec3 GetPos() { return pos; }
-	float GetRadius() { return radius; }
+	float GetRadius() { return rad; }
 
 	void SetPos(glm::vec3 pos)
 	{
 		this->pos = pos;
 	}
 
-	void SetRadius(float radius)
+	void SetRad(float rad)
 	{
-		this->radius = radius;
+		this->rad = rad;
 	}
 
 
 private:
 	glm::vec3 pos;
-	float radius;
+	float rad;
 };
 
 class MeshManager
@@ -56,14 +54,13 @@ public:
 	MeshManager();
 	~MeshManager();
 
-
 	void Draw();
 	void Intitalize(Vertex* vertices, unsigned int verticesCount, unsigned int* indices, unsigned int indicesCount);
 	void ModelLoader(const std::string& filename);
 	void IntitalizeModel(const IndexedModel& model);
-	void updateSphereData(glm::vec3 pos, float radius);
-	glm::vec3 getSpherePos() { return meshSphere.GetPos(); }
-	float getSphereRadius() { return meshSphere.GetRadius(); }
+	void UpdateColData(glm::vec3 pos, float radius);
+	glm::vec3 getSpherePos() { return colMesh.GetPos(); }
+	float getSphereRadius() { return colMesh.GetRadius(); }
 
 private:
 
@@ -78,7 +75,7 @@ private:
 
 	//CollisonDetection col;
 
-	Sphere meshSphere;
+	Sphere colMesh;
 	GLuint VAObject;
 	GLuint VABuffer[NUM_OF_BUFFERS]; // create our array of buffers
 	unsigned int drawCounter; //how much of the VAObject do we want to draw

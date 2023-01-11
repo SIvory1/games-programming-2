@@ -4,8 +4,11 @@
 
 CubemapManager::CubemapManager() 
 {  
-    skyboxVAO = 0;
-    skyboxVBO = 0;
+    skyboxVAO = NULL;
+    skyboxVBO = NULL;
+    cubeVAO = NULL;
+    cubeVBO = NULL; 
+    cubemapTextureID = NULL;  
 }
 
 CubemapManager::~CubemapManager()

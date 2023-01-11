@@ -42,13 +42,7 @@
     <ClCompile Include="AudioManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CubemapManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CollisonDetection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -83,13 +77,7 @@
     <ClInclude Include="Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CubemapManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CollisonDetection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -120,21 +108,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="..\res\monkey3.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
     <Object Include="..\res\cube.obj">
       <Filter>Resource Files</Filter>
     </Object>
-    <Object Include="..\res\Zuccarello.obj">
+    <Object Include="..\res\WoodenLog_obj.OBJ">
+      <Filter>Resource Files</Filter>
+    </Object>
+    <Object Include="..\res\Apple_obj.obj">
       <Filter>Resource Files</Filter>
     </Object>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\res\background.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="..\res\whistle.wav">
       <Filter>Resource Files</Filter>
     </Media>
   </ItemGroup>

@@ -21,7 +21,6 @@ private:
 	unsigned int cubemapTextureID;
 	unsigned int cubeVAO, cubeVBO;
 	unsigned int skyboxVAO, skyboxVBO;
-	ShaderManager shaderManager;
 };
 
 

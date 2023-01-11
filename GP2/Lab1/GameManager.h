@@ -10,7 +10,6 @@
 #include "AudioManager.h"
 #include "GameObject.h"
 #include "TextureManager.h"
-#include "CollisonDetection.h"
 #include "CubemapManager.h"
 
 
@@ -26,20 +25,18 @@ public:
 
 private:
 
-	void Fog();
 	void SystemsStart();
 	void ProcessInputs();
 	void GameActive();
-	void TransformMesh();
-	void TransformMesh1();
-	void TransformMesh2();
+	void Apple();
+	void Spinning();
+	void Ground();
 	void DrawSkyBox();
 	void DrawReflection();
 	void DrawRefraction();
 	void DrawGame();
-	void ShootObject();
-	bool collision(glm::vec3 m1Pos, float m1Rad, glm::vec3 m2Pos, float m2Rad);
-	bool newCol(MeshManager& mesh, MeshManager& mesh1);
+	void Tree();
+	bool IsColliding(MeshManager& mesh, MeshManager& mesh1);
 	//void playAudio(unsigned int Source, glm::vec3 pos);
 
 	DisplayGame gameDisplay;
@@ -48,6 +45,8 @@ private:
 	MeshManager mesh1;
 	MeshManager mesh2;
 	MeshManager mesh3;
+	MeshManager mesh4;
+	MeshManager mesh5;
 	MainCamera mainCamera;
 	ShaderManager shader;
 	ShaderManager cubemapShader;
@@ -57,25 +56,21 @@ private:
 	AudioManager gameAudio;
 	TextureManager texture;
 	TextureManager texture1;
+	TextureManager grenadeTexture;
+	TextureManager texture2;
 	CubemapManager cubeMap;
-//	CollisonDetection col;
 
 	float counter;
-	float inputCounter;
+	float collsionCounter;
 
-	bool pressedDown;
-	
-	float deltaX;
-	float preDeltaX;
+	float x;
+	float preX;
 
-	float deltaY;
-	float preDeltaY;
+	float y;
+	float preY;
 
-	// objetc manipluation
 	float scale;
 	float offset;
 
-	float collsionCounter;
-	//bool hasCollided;
 };
 

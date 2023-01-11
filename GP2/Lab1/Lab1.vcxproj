@@ -73,10 +73,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CollisonDetection.cpp" />
     <ClCompile Include="CubemapManager.cpp" />
     <ClCompile Include="DisplayGame.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="MeshManager.cpp" />
@@ -87,9 +85,7 @@
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CollisonDetection.h" />
     <ClInclude Include="CubemapManager.h" />
-    <ClInclude Include="GameObject.h" />
     <ClInclude Include="MainCamera.h" />
     <ClInclude Include="DisplayGame.h" />
     <ClInclude Include="GameManager.h" />
@@ -112,19 +108,18 @@
     <None Include="..\res\shader.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Object Include="..\res\Apple_obj.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
     <Object Include="..\res\cube.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </Object>
-    <Object Include="..\res\monkey3.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </Object>
-    <Object Include="..\res\Zuccarello.obj">
+    <Object Include="..\res\WoodenLog_obj.OBJ">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </Object>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\res\background.wav" />
-    <Media Include="..\res\whistle.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

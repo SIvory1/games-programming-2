@@ -2,6 +2,7 @@
 
 AudioManager::AudioManager()
 {
+    // init variables
     music = NULL;
 
     int audio_rate = 22050;
@@ -11,7 +12,7 @@ AudioManager::AudioManager()
 
     if (Mix_OpenAudio(audio_rate, audio_format, audio_channels, audio_buffers) != 0)
     {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't init audio: %s", Mix_GetError());
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initizale audio: %s", Mix_GetError());
         exit(-1);
     }
 }
@@ -20,6 +21,7 @@ AudioManager::~AudioManager()
 {
     SDL_Quit();
 }
+
 
 void AudioManager::AddSound(const char* path)
 {
@@ -46,14 +48,14 @@ void AudioManager::AddAudio(const char* path)
     }
 }
 
-void AudioManager::PlaySound(const int which) const
+void AudioManager::PlaySound(const int x) const
 {
-    if (which > soundHolder.size() - 1)
+    if (x > soundHolder.size() - 1)
     {
         return;
     }
 
-    Mix_PlayChannel(-1, soundHolder[which], 0);
+    Mix_PlayChannel(-1, soundHolder[x], 0);
 }
 
 void AudioManager::PlayAudio()

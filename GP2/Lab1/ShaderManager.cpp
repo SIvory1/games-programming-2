@@ -4,6 +4,7 @@
 
 ShaderManager::ShaderManager()
 {
+	// init variables
 	program = NULL;	
 }
 
@@ -12,37 +13,34 @@ ShaderManager::~ShaderManager()
 	for (unsigned int i = 0; i < NUM_OF_SHADERS; i++)
 	{
 		glDetachShader(program, shaders[i]); //detach shader from program
-		glDeleteShader(shaders[i]); //deletes shaders once attached
 	}
 	glDeleteProgram(program); // delete the program
 }
 
 void ShaderManager::InitalizeShader(const std::string& filename)
 {
-	program = glCreateProgram(); // create shader program (openGL saves as ref number)
+	program = glCreateProgram(); // create shader program 
 	shaders[0] = CreateShader(ShaderLoader( filename + ".vert"), GL_VERTEX_SHADER); // create vertex shader
 	shaders[1] = CreateShader(ShaderLoader(filename + ".frag"), GL_FRAGMENT_SHADER); // create fragment shader
 
 	for (unsigned int i = 0; i < NUM_OF_SHADERS; i++)
 	{
-		glAttachShader(program, shaders[i]); //add all our shaders to the shader program "shaders" 
+		glAttachShader(program, shaders[i]); //attach shader to program,
+		glDeleteShader(shaders[i]); //once shaders are attached they are deleted
 	}
 
-	glBindAttribLocation(program, 0, "position"); // associate attribute variable with our shader program attribute (in this case attribute vec3 position;)
-	glBindAttribLocation(program, 1, "texCoord");
-
 	glLinkProgram(program); //create executables that will run on the GPU shaders
-	CheckShaderError(program, GL_LINK_STATUS, true, "Error: Shader program linking failed"); // cheack for error
+	CheckForError(program, GL_LINK_STATUS, true, "Error: Shader program linking failed"); // checks for error
 
-	glValidateProgram(program); //check the entire program is valid
-	CheckShaderError(program, GL_VALIDATE_STATUS, true, "Error: Shader program not valid");
+	glValidateProgram(program); //checks if program is valid
+	CheckForError(program, GL_VALIDATE_STATUS, true, "Error: Shader program not valid");
 
-
-	uniforms[TRANSFORM_U] = glGetUniformLocation(program, "transform"); // associate with the location of uniform variable within a program
-	uniforms[VIEWMATRIX_U] = glGetUniformLocation(program, "view"); // associate with the location of uniform variable within a program
-	uniforms[PROJECTION_U] = glGetUniformLocation(program, "projection"); // associate with the location of uniform variable within a program 
-	uniforms[MODEL_U] = glGetUniformLocation(program, "model"); // associate with the location of uniform variable within a program 
-	uniforms[CAMERAPOS_U] = glGetUniformLocation(program, "cameraPos"); // associate with the location of uniform variable within a program
+	// gets location of uniforms
+	uniforms[TRANSFORM_U] = glGetUniformLocation(program, "transform"); 
+	uniforms[VIEWMATRIX_U] = glGetUniformLocation(program, "view"); 
+	uniforms[PROJECTION_U] = glGetUniformLocation(program, "projection"); 
+	uniforms[MODEL_U] = glGetUniformLocation(program, "model"); 
+	uniforms[CAMERAPOS_U] = glGetUniformLocation(program, "cameraPos"); 
 }
 
 void ShaderManager::Bind()
@@ -56,27 +54,33 @@ void ShaderManager::UpdateShader(const Transform& transform, const MainCamera& c
 	glUniformMatrix4fv(uniforms[TRANSFORM_U], 1, GLU_FALSE, &mvp[0][0]);
 }
 
+// updates cubemap values
 void ShaderManager::UpdateCubemap(const MainCamera& cam)
 {
-	glm::mat4 view = (glm::mat3(cam.GetView()));
-	glm::mat4 projection = cam.GetProjection();
+	glm::mat4 view = (glm::mat3(cam.GetView())); // need to remove translation so it doesnt move with player
+	glm::mat4 projection = cam.GetProjection(); // get projection matrix
 
+	// send unfiorm location and value to shader 
 	glUniformMatrix4fv(uniforms[VIEWMATRIX_U], 1, GLU_FALSE, &view[0][0]);
 	glUniformMatrix4fv(uniforms[PROJECTION_U], 1, GLU_FALSE, &projection[0][0]);
 }
 
+// updates cube values
 void ShaderManager::UpdateReflections(const Transform& transform, const MainCamera& cam)
 {
-	glm::mat4 view = cam.GetView();
-	glm::mat4 projection = cam.GetProjection();
-	glm::mat4 model = transform.GetModel();
-	glm::vec3 cameraPos = cam.getPosition();
+	// values to be given to shader
+	glm::mat4 view = cam.GetView(); // gets view matrix
+	glm::mat4 projection = cam.GetProjection(); // gets projection matrix
+	glm::mat4 model = transform.GetModel(); // gets model
+	glm::vec3 cameraPos = cam.getPosition();  // gets cam pos
 
+	// send unfiorm location and value to shader 
 	glUniformMatrix4fv(uniforms[VIEWMATRIX_U], 1, GLU_FALSE, &view[0][0]);
 	glUniformMatrix4fv(uniforms[PROJECTION_U], 1, GLU_FALSE, &projection[0][0]);
 	glUniformMatrix4fv(uniforms[MODEL_U], 1, GLU_FALSE, &model[0][0]);
 	glUniform3fv(uniforms[CAMERAPOS_U], 1, &cameraPos[0]);
 }
+
 
 GLuint ShaderManager::CreateShader(const std::string& text, unsigned int type)
 {
@@ -93,11 +97,12 @@ GLuint ShaderManager::CreateShader(const std::string& text, unsigned int type)
 	glShaderSource(shader, 1, stringSource, lengths); //send source code to opengl
 	glCompileShader(shader); //get open gl to compile shader code
 
-	CheckShaderError(shader, GL_COMPILE_STATUS, false, "Error compiling shader!"); //check for compile error
+	CheckForError(shader, GL_COMPILE_STATUS, false, "Error compiling shader!"); //check for compile error
 
 	return shader;
 }
 
+// loads shader from file
 std::string ShaderManager::ShaderLoader(const std::string& filename)
 {
 	std::ifstream file;
@@ -122,7 +127,8 @@ std::string ShaderManager::ShaderLoader(const std::string& filename)
 	return output;
 }
 
-void ShaderManager::CheckShaderError(GLuint shader, GLuint flag, bool programOn, const std::string& errorMessage)
+// used to reutrn errors 
+void ShaderManager::CheckForError(GLuint shader, GLuint flag, bool programOn, const std::string& errorMessage)
 {
 	GLint success = 0;
 	GLchar error[1024] = { 0 };

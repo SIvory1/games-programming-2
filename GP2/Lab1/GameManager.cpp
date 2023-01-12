@@ -9,15 +9,13 @@ Transform transform;
 
 GameManager::GameManager()
 {
+	// init variables
 	offset = 0.0;
 	scale = 1;
 
 	counter = 0;
 	gameState = GameState::PLAY;
 	DisplayGame* gameDisplay = new DisplayGame(); //new display
-	// what is this
-    MeshManager* mesh();
-	MeshManager* mesh1();
 
 	counter = 1.0f;
 	collsionCounter = 1.0f;
@@ -32,50 +30,48 @@ GameManager::~GameManager()
 {
 }
 
+// function called when game starts
 void GameManager::run()
 {
 	SystemsStart();
 	GameActive();
 }
 
+// initalizes shader, textures, meshes, sounds 
 void GameManager::SystemsStart()
 {
-	gameDisplay.InitalizeDisplay(); 
+	gameDisplay.InitalizeDisplay();
+
+    // audio 
 	gameAudio.AddAudio("..\\res\\background.wav");
 	gameAudio.AddSound("..\\res\\shoot.wav");
+	gameAudio.PlayAudio();
 
+	// loads in models
+	cube.ModelLoader("..\\res\\cube.obj");
+	tree.ModelLoader("..\\res\\WoodenLog_obj.obj");
+	apple.ModelLoader("..\\res\\Apple_obj.obj");
 
-
-	mesh2.ModelLoader("..\\res\\cube.obj");
-	mesh4.ModelLoader("..\\res\\WoodenLog_obj.obj");
-	mesh5.ModelLoader("..\\res\\Apple_obj.obj");
-
-	// saves loadign from file all over;//
-	mesh1 = mesh;
-	
 	mainCamera.InitializeCamera(glm::vec3(0, 0, -5), glm::radians(mainCamera.fov), (float)gameDisplay.getX()/gameDisplay.getY(), 0.01f, 1000.0f);
 
-	shader.InitalizeShader("..\\res\\shader"); //new shader
-	// initalize cubemap shader here as well
+	// initalizes shaders
+	shader.InitalizeShader("..\\res\\shader");
 	cubemapShader.InitalizeShader("..\\res\\cubemapShader");
-
-	cubeMap.InitalizeCubeMap();
-
 	reflectionShader.InitalizeShader("..\\res\\reflectionShader");
 	refractionShader.InitalizeShader("..\\res\\refractionShader");
 
+	// initalizes cubemap/cube functions
+	cubeMap.InitalizeCubeMap();
 	cubeMap.CubeVertexArrayObject();
 
-	texture.TextureLoader("..\\res\\TarmacDark_D.jpg"); //load texture
-	texture1.TextureLoader("..\\res\\water.jpg"); //load texture
-	grenadeTexture.TextureLoader("..\\res\\WoodenLog_Diffuse_8K.jpg");
-	texture2.TextureLoader("..\\res\\apple l_Material.003_BaseColor.png");
-
-		gameAudio.PlayAudio();
+	// loads and initalizes textures
+	tarmacTex.TextureLoader("..\\res\\TarmacDark_D.jpg"); //load texture
+	treeTex.TextureLoader("..\\res\\WoodenLog_Diffuse_8K.jpg");
+	appleTex.TextureLoader("..\\res\\apple l_Material.003_BaseColor.png");
 }
 
 //https://www.libsdl.org/release/SDL-1.2.15/docs/html/guidetimeexamples.html
-// used to regulate frame rate???
+// used to regulate frame rate
 static Uint32 next_time;
 
 Uint32 time_left(void)
@@ -93,13 +89,14 @@ Uint32 time_left(void)
 void GameManager::GameActive()
 {
 	next_time = SDL_GetTicks() + TICK_INTERVAL;
+	// if game isnt closed then constantly function calls fucntiosn that need to be updated regulary
 	while (gameState != GameState::EXIT)
 	{
 		ProcessInputs();
 		DrawGame();
-		IsColliding(mesh, mesh1);
-		IsColliding(mesh, mesh5);
-		IsColliding(mesh1, mesh5);
+		IsColliding(apple, tree);
+
+		// used for regulating framerate
 		SDL_Delay(time_left());
 		next_time += TICK_INTERVAL;
 
@@ -108,12 +105,9 @@ void GameManager::GameActive()
 	}
 }
 
-// adding cube map, reworking collsions 
 void GameManager::ProcessInputs()
 {
-
 	SDL_Event event;
-
 	while (SDL_PollEvent(&event)) //get and process events
 	{
 		switch (event.type)
@@ -123,21 +117,25 @@ void GameManager::ProcessInputs()
 			break;
 		case SDL_MOUSEWHEEL:
 		{
+			// when player used scroll wheel
 			if (event.wheel.y > 0 && mainCamera.fov != 0)			
 			{			
+				// increases fov
 				mainCamera.Zoom(-1);
-				cout << mainCamera.fov << '\n';
+				// updates fov 
 				mainCamera.ChangeFOV(glm::radians(mainCamera.fov), (float)gameDisplay.getX() / gameDisplay.getY(), 0.01f, 1000.0f);
 			}
 		    if (event.wheel.y < 0)
 			{
+				// decreases fov
 				mainCamera.Zoom(1);
-				cout << mainCamera.fov << '\n';
+				// updates fov 
 				mainCamera.ChangeFOV(glm::radians(mainCamera.fov), (float)gameDisplay.getX() / gameDisplay.getY(), 0.01f, 1000.0f);
 			}
 		}
 		case SDL_MOUSEBUTTONDOWN:
 		{
+			// when player inputs mouse buttons objects in scene moves 
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
 				offset += 1;
@@ -151,6 +149,7 @@ void GameManager::ProcessInputs()
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym)
 			{
+				// players wasd, shift, space movement 
 			case SDLK_w:
 				mainCamera.MoveForward(1);
 				break;
@@ -169,6 +168,7 @@ void GameManager::ProcessInputs()
 			case SDLK_LSHIFT:
 				mainCamera.MoveVertical(-1);
 				break;
+				// can adjust object size
 			case SDLK_e:
 				scale += .1;
 				break;
@@ -178,8 +178,9 @@ void GameManager::ProcessInputs()
 					scale -= .1;
 				}
 				break;
+				// reset camera pos 
 			case SDLK_v:
-				mainCamera.InitializeCamera(glm::vec3(0, 0, -5), mainCamera.fov, (float)gameDisplay.getX() / gameDisplay.getY(), 0.01f, 1000.0f);
+				mainCamera.InitializeCamera(glm::vec3(0, 0, -5), glm::radians(mainCamera.fov), (float)gameDisplay.getX() / gameDisplay.getY(), 0.01f, 1000.0f);
 				break;
 			}
 		case SDL_MOUSEMOTION:
@@ -213,14 +214,15 @@ void GameManager::ProcessInputs()
     }
 }
 
+// reads in 2 meshes and checks if they are colliding
 bool GameManager::IsColliding(MeshManager& mesh, MeshManager& mesh1)
 {
-	// magnitiude clacaultion
+
 	float distance = 
 		((mesh1.getSpherePos().x - mesh.getSpherePos().x) * (mesh1.getSpherePos().x - mesh.getSpherePos().x) 
 		+ (mesh1.getSpherePos().y - mesh.getSpherePos().y) * (mesh1.getSpherePos().y - mesh.getSpherePos().y) 
 		+ (mesh1.getSpherePos().z - mesh.getSpherePos().z) * (mesh1.getSpherePos().z - mesh.getSpherePos().z));
-	if (distance * distance < (mesh.getSphereRadius() + mesh1.getSphereRadius()))
+	if (distance * distance < (mesh.getSphereRad() + mesh1.getSphereRad()))
 	{	
     	collsionCounter *= 0;
 		gameAudio.PlaySound(0);
@@ -230,37 +232,25 @@ bool GameManager::IsColliding(MeshManager& mesh, MeshManager& mesh1)
 }
 
 
-void GameManager::Apple()
-{
-	transform.SetPos(glm::vec3(offset, -0.5, 0.0));
-	transform.SetRot(glm::vec3(0.0, counter * 2, 0.0));
-	transform.SetScale(glm::vec3(scale, scale, scale));
-
-	texture2.BindTexture(0);
-
-	shader.Bind();
-	shader.UpdateShader(transform, mainCamera);
-
-	mesh5.UpdateColData(*transform.GetPos(), scale);
-
-	mesh5.Draw();
-}
-
-
 void GameManager::Spinning()
 {
-	transform.SetPos(glm::vec3(-sinf(collsionCounter), -0.5, -sinf(collsionCounter) * 5));
+	// sets pos, rotation, scale
+	transform.SetPos(glm::vec3(-sinf(collsionCounter), 0, -sinf(collsionCounter) * 5));
 	transform.SetRot(glm::vec3(0.0, 0.0, 0/*counter * 5*/));
 	transform.SetScale(glm::vec3(scale, scale, scale));
 
-	texture2.BindTexture(0);
+	// binds texture
+	appleTex.BindTexture(0);
 
+	// bind shader and updates 
 	shader.Bind();
 	shader.UpdateShader(transform, mainCamera);
 
-	mesh1.UpdateColData(*transform.GetPos(), scale);
+	// updates col
+	apple.UpdateColData(*transform.GetPos(), scale);
 	
-	mesh5.Draw();
+	// draws object 
+	apple.Draw();
 }
 
 void GameManager::Ground()
@@ -268,14 +258,14 @@ void GameManager::Ground()
 	transform.SetPos(glm::vec3(10, -4, -15));
 	transform.SetScale(glm::vec3(50, 1 ,50));
 
-	texture.BindTexture(0);
+	tarmacTex.BindTexture(0);
 
 	shader.Bind();
 	shader.UpdateShader(transform, mainCamera);
 
-	mesh2.UpdateColData(*transform.GetPos(), 1);
+	cube.UpdateColData(*transform.GetPos(), 1);
 
-	mesh2.Draw();
+	cube.Draw();
 }
 
 void GameManager::Tree()
@@ -284,14 +274,14 @@ void GameManager::Tree()
 		transform.SetRot(glm::vec3(0.0, counter * 2, 0));
      	transform.SetScale(glm::vec3(scale, scale, scale));
 
-		grenadeTexture.BindTexture(0);
+		treeTex.BindTexture(0);
 
 		shader.Bind();
 		shader.UpdateShader(transform, mainCamera);
 
-		mesh.UpdateColData(*transform.GetPos(), scale);
+		tree.UpdateColData(*transform.GetPos(), scale);
 
-		mesh4.Draw();
+		tree.Draw();
 }
 
 void GameManager::DrawSkyBox()
@@ -310,8 +300,8 @@ void GameManager::DrawRefraction()
 	transform.SetRot(glm::vec3(0.0, counter * 2, 0));
 	transform.SetScale(glm::vec3(1, 1, 1));
 
-	reflectionShader.Bind();
-	reflectionShader.UpdateReflections(transform, mainCamera);
+	refractionShader.Bind();
+	refractionShader.UpdateReflections(transform, mainCamera);
 	cubeMap.DrawCube();
 }
 void GameManager::DrawReflection()
@@ -320,8 +310,8 @@ void GameManager::DrawReflection()
 	transform.SetRot(glm::vec3(0.0, counter , 0));
 	transform.SetScale(glm::vec3(1, 1, 1));
 
-	refractionShader.Bind();
-	refractionShader.UpdateReflections(transform, mainCamera);
+	reflectionShader.Bind();
+	reflectionShader.UpdateReflections(transform, mainCamera);
 	cubeMap.DrawCube();
 }
 
@@ -329,7 +319,6 @@ void GameManager::DrawGame()
 {
 	gameDisplay.ClearDisplay(0.5, 0.5, 0.5, 1.0);
 
-	Apple();
     Spinning();
 	Ground();
 	Tree();
@@ -337,8 +326,10 @@ void GameManager::DrawGame()
 	DrawReflection();
 	DrawSkyBox();
 
+	// counter is adjusted 
 	counter = counter + 0.05f;
 	collsionCounter = collsionCounter + 0.05f;
+
 
 	glEnableClientState(GL_COLOR_ARRAY); 
 	glEnd();

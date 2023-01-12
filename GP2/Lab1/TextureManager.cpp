@@ -5,6 +5,9 @@
 
 TextureManager::TextureManager()
 {
+	// init variables
+	textureID = 0;
+	textureManager = 0;
 }
 
 TextureManager::~TextureManager()
@@ -14,10 +17,10 @@ TextureManager::~TextureManager()
 
 void TextureManager::BindTexture(unsigned int obj)
 {
-	assert(obj >= 0 && obj <= 31); /// check we are working with one of the 32 textures
+	assert(obj >= 0 && obj <= 31); // checks if we are usign one of 32 textures
 
-	glActiveTexture(GL_TEXTURE0 + obj); //set acitve texture unit
-	glBindTexture(GL_TEXTURE_2D, textureManager); //type of and texture to bind to unit
+	glActiveTexture(GL_TEXTURE0 + obj); //set active texture unit
+	glBindTexture(GL_TEXTURE_2D, textureManager); //binds texture 
 }
 
 void TextureManager::TextureLoader(const std::string& filename)
@@ -31,19 +34,19 @@ void TextureManager::TextureLoader(const std::string& filename)
 	}
 
 	glGenTextures(1, &textureID); // number of and address of textures
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID); //bind texture - define type 
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID); //bind texture 
 
 
 	glGenTextures(1, &textureManager); // number of and address of textures
-	glBindTexture(GL_TEXTURE_2D, textureManager); //bind texture - define type 
+	glBindTexture(GL_TEXTURE_2D, textureManager); //bind texture 
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // wrap texture outside width
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // wrap texture outside height
 
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // linear filtering for minification (texture is smaller than area)
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // linear filtering for magnifcation (texture is larger)
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // linear filtering for minification 
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // linear filtering for magnifcation 
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, X, Y, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData); //Target, Mipmapping Level, Pixel Format, Width, Height, Border Size, Input Format, Data Type of Texture, Image Data
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, X, Y, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData); 
 
 	stbi_image_free(imageData);
 }

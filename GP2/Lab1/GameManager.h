@@ -28,7 +28,6 @@ private:
 	void SystemsStart();
 	void ProcessInputs();
 	void GameActive();
-	void Apple();
 	void Spinning();
 	void Ground();
 	void DrawSkyBox();
@@ -37,16 +36,12 @@ private:
 	void DrawGame();
 	void Tree();
 	bool IsColliding(MeshManager& mesh, MeshManager& mesh1);
-	//void playAudio(unsigned int Source, glm::vec3 pos);
 
 	DisplayGame gameDisplay;
 	GameState gameState;
-	MeshManager mesh;
-	MeshManager mesh1;
-	MeshManager mesh2;
-	MeshManager mesh3;
-	MeshManager mesh4;
-	MeshManager mesh5;
+	MeshManager cube;
+	MeshManager apple;
+	MeshManager tree;
 	MainCamera mainCamera;
 	ShaderManager shader;
 	ShaderManager cubemapShader;
@@ -54,23 +49,23 @@ private:
 	ShaderManager refractionShader;
 
 	AudioManager gameAudio;
-	TextureManager texture;
-	TextureManager texture1;
-	TextureManager grenadeTexture;
-	TextureManager texture2;
+	TextureManager tarmacTex;
+	TextureManager treeTex;
+	TextureManager appleTex;
 	CubemapManager cubeMap;
 
+	// for object transform
 	float counter;
 	float collsionCounter;
 
+	// mouse movement
 	float x;
 	float preX;
-
 	float y;
 	float preY;
 
+	// object manipluation
 	float scale;
 	float offset;
-
 };
 

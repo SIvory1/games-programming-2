@@ -22,5 +22,3 @@ private:
 	unsigned int cubeVAO, cubeVBO;
 	unsigned int skyboxVAO, skyboxVBO;
 };
-
-

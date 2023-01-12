@@ -25,12 +25,13 @@ private:
 	glm::vec3 normal;
 };
 
+// used for collison detection
 struct Sphere
 {
 public:
 
 	glm::vec3 GetPos() { return pos; }
-	float GetRadius() { return rad; }
+	float GetRad() { return rad; }
 
 	void SetPos(glm::vec3 pos)
 	{
@@ -60,7 +61,7 @@ public:
 	void IntitalizeModel(const IndexedModel& model);
 	void UpdateColData(glm::vec3 pos, float radius);
 	glm::vec3 getSpherePos() { return colMesh.GetPos(); }
-	float getSphereRadius() { return colMesh.GetRadius(); }
+	float getSphereRad() { return colMesh.GetRad(); }
 
 private:
 
@@ -72,8 +73,6 @@ private:
 		VB_INDEX,
 		NUM_OF_BUFFERS
 	};
-
-	//CollisonDetection col;
 
 	Sphere colMesh;
 	GLuint VAObject;

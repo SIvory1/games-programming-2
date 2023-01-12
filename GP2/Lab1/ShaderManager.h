@@ -17,7 +17,7 @@ public:
 	void UpdateReflections(const Transform& transform, const MainCamera& cam);
 
 	std::string ShaderManager::ShaderLoader(const std::string& fileName);
-	void ShaderManager::CheckShaderError(GLuint shader, GLuint flag, bool programOn, const std::string& errorMessage);
+	void ShaderManager::CheckForError(GLuint shader, GLuint flag, bool programOn, const std::string& errorMessage);
 	GLuint ShaderManager::CreateShader(const std::string& text, unsigned int type);
 
 private:

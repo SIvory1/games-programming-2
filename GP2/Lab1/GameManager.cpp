@@ -4,7 +4,6 @@
 #include <string>
 #define TICK_INTERVAL 30;
 
-
 Transform transform;
 
 GameManager::GameManager()

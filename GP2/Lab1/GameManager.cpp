@@ -70,7 +70,7 @@ void GameManager::SystemsStart()
 	appleTex.TextureLoader("..\\res\\apple l_Material.003_BaseColor.png");
 }
 
-//https://www.libsdl.org/release/SDL-1.2.15/docs/html/guidetimeexamples.html
+
 // used to regulate frame rate
 static Uint32 next_time;
 
